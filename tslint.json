@@ -3,6 +3,10 @@
     "extends": [
         "tslint:recommended"
     ],
+    "quotemark": [
+        true,
+        "single"
+    ],
     "jsRules": {},
     "rules": {
         "trailing-comma": [

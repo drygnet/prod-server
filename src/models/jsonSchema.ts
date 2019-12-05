@@ -1,41 +1,41 @@
-interface IjsonSchemaBase {
-    description?: string
+interface IJsonSchemaBase {
+    description?: string;
 }
 
-export interface IjsonSchema extends IjsonSchemaBase {
-    bsonType: 'object'
+export interface IJsonSchema extends IJsonSchemaBase {
+    bsonType: "object";
     required?: string[];
     properties: {
         [name: string]:
-        IjsonSchema |
-        IjsonSchemaEnum |
-        IjsonSchemaString |
-        IjsonSchemaDouble |
-        IjsonSchemaInt |
-        IjsonSchemaArray
-    },
+        IJsonSchema |
+        IJsonSchemaEnum |
+        IJsonSchemaString |
+        IJsonSchemaDouble |
+        IJsonSchemaInt |
+        IJsonSchemaArray
+    };
 }
 
-interface IjsonSchemaEnum extends IjsonSchemaBase {
+interface IJsonSchemaEnum extends IJsonSchemaBase {
     enum: string[];
 }
 
-interface IjsonSchemaString extends IjsonSchemaBase {
-    bsonType: 'string',
-    pattern?: string
+interface IJsonSchemaString extends IJsonSchemaBase {
+    bsonType: "string";
+    pattern?: string;
 }
 
-interface IjsonSchemaInt extends IjsonSchemaBase {
-    bsonType: 'int',
-    minimum?: number,
-    maximum?: number
+interface IJsonSchemaInt extends IJsonSchemaBase {
+    bsonType: "int";
+    minimum?: number;
+    maximum?: number;
 }
 
-interface IjsonSchemaDouble extends IjsonSchemaBase {
-    bsonType: 'double'
+interface IJsonSchemaDouble extends IJsonSchemaBase {
+    bsonType: "double";
 }
 
-interface IjsonSchemaArray extends IjsonSchemaBase {
-    bsonType: 'array'
-    items: IjsonSchema[]
+interface IJsonSchemaArray extends IJsonSchemaBase {
+    bsonType: "array";
+    items: IJsonSchema[];
 }
