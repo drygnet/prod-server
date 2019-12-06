@@ -1,4 +1,4 @@
-import transportSchema from "./schema";
+import transportSchema from './schema';
 
 class InternTransport {
     public schema = transportSchema;

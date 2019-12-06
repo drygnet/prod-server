@@ -1,13 +1,13 @@
-import { IJsonSchema } from "../../models/jsonSchema";
+import { IJsonSchema } from '../../models/jsonSchema';
 
 const schema: IJsonSchema = {
-    bsonType: "object",
+    bsonType: 'object',
     properties: {
-        bookingId: { bsonType: "int" },
-        title: { bsonType: "string" }
+        bookingId: { bsonType: 'int' },
+        title: { bsonType: 'string' }
 
     },
-    required: ["bookingId", "title"]
+    required: ['bookingId', 'title']
 };
 
 export default schema;

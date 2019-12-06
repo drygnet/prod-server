@@ -1,8 +1,8 @@
-import { InternTransport } from "./interntransport/interntransport";
-import Tvinnaren from "./tvinnaren/tvinnaren";
+import { InternTransport } from './interntransport/interntransport';
+import Tvinnaren from './tvinnaren/tvinnaren';
 
 const apps = {
-    // internTransport: InternTransport,
+    // internTransport (camelCase): InternTransport,
     tvinnaren: Tvinnaren
 };
 

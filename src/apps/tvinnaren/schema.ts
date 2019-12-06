@@ -1,26 +1,26 @@
-import { IJsonSchema } from "../../models/jsonSchema";
+import { IJsonSchema } from '../../models/jsonSchema';
 
 const tvinnarenCase: IJsonSchema = {
-    bsonType: "object",
+    bsonType: 'object',
     properties: {
-        caseId: { bsonType: "int" },
-        status: { enum: ["nytt", "stängt"] },
+        caseId: { bsonType: 'int' },
+        status: { enum: ['nytt', 'stängt'] },
         subcases: {
-            bsonType: "array",
+            bsonType: 'array',
             items: [
                 {
-                    bsonType: "object",
+                    bsonType: 'object',
                     properties: {
-                        status: { enum: ["nytt", "arbetar"] }
+                        status: { enum: ['nytt', 'arbetar'] }
                     }
                 }
             ]
 
         },
-        title: { bsonType: "string" }
+        title: { bsonType: 'string' }
 
     },
-    required: ["caseId", "title"]
+    required: ['caseId', 'title']
 };
 
 export default tvinnarenCase;

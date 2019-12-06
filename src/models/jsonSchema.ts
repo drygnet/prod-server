@@ -3,7 +3,7 @@ interface IJsonSchemaBase {
 }
 
 export interface IJsonSchema extends IJsonSchemaBase {
-    bsonType: "object";
+    bsonType: 'object';
     required?: string[];
     properties: {
         [name: string]:
@@ -21,21 +21,21 @@ interface IJsonSchemaEnum extends IJsonSchemaBase {
 }
 
 interface IJsonSchemaString extends IJsonSchemaBase {
-    bsonType: "string";
+    bsonType: 'string';
     pattern?: string;
 }
 
 interface IJsonSchemaInt extends IJsonSchemaBase {
-    bsonType: "int";
+    bsonType: 'int';
     minimum?: number;
     maximum?: number;
 }
 
 interface IJsonSchemaDouble extends IJsonSchemaBase {
-    bsonType: "double";
+    bsonType: 'double';
 }
 
 interface IJsonSchemaArray extends IJsonSchemaBase {
-    bsonType: "array";
+    bsonType: 'array';
     items: IJsonSchema[];
 }

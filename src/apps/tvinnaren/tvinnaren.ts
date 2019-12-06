@@ -1,10 +1,13 @@
-import appSchema from "./schema";
+import tvinnarenCase from './schema';
 
 const Tvinnaren = {
-    index: "tvinnaren",
-    schema: appSchema,
-    // tslint:disable-next-line:object-literal-sort-keys
-    greet: "hello from tvinnaren"
+    collections: [
+        {
+            name: 'tvinnarenCase',
+            schema: tvinnarenCase
+        }
+    ],
+    greet: () => 'hello from TvI'
 };
 
 export default Tvinnaren;
