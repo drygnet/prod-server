@@ -1,11 +1,14 @@
 import bodyParser from 'body-parser';
 import express from 'express';
+import { initDB } from './initDB';
 import { checkCollection, resolveApp, resolveFunction } from './middleware';
 import { MongoHelper } from './mongo.helper';
 
 const jsonParser = bodyParser.json();
 const srv = express();
-const port = 4000; // default port to listen
+const port = 4000;
+
+initDB();
 
 srv.use(jsonParser);
 srv.use('/:appName/*', resolveApp);

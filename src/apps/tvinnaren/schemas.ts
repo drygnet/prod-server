@@ -1,4 +1,4 @@
-import { IJsonSchema } from '../../models/jsonSchema';
+import { IJsonSchema } from '../../models/IJsonSchema';
 
 const tvinnarenCase: IJsonSchema = {
     bsonType: 'object',
@@ -23,4 +23,4 @@ const tvinnarenCase: IJsonSchema = {
     required: ['caseId', 'title']
 };
 
-export default tvinnarenCase;
+export { tvinnarenCase };

@@ -1,11 +1,15 @@
 import express from 'express';
-import tvinnarenCase from './schema';
+import { IApp } from './../../models/IApp';
+import { tvinnarenCase } from './schemas';
 
-const tvinnaren = {
+const tvinnaren: IApp = {
     collections: [
         {
-            name: 'tvinnarenCase',
+            name: 'cases',
             schema: tvinnarenCase
+        },
+        {
+            name: 'products',
         }
     ],
     closeCases: (req: express.Request, res: express.Response) => {

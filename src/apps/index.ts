@@ -1,7 +1,8 @@
-import { InternTransport } from './interntransport/interntransport';
-import tvinnaren from './tvinnaren/tvinnaren';
+import interntransport from './interntransport';
+import tvinnaren from './tvinnaren';
 
 const apps = {
+    interntransport,
     tvinnaren
 };
 

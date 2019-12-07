@@ -1,13 +1,12 @@
-import { IJsonSchema } from '../../models/jsonSchema';
+import { IJsonSchema } from '../../models/IJsonSchema';
 
-const schema: IJsonSchema = {
+const transportBooking: IJsonSchema = {
     bsonType: 'object',
     properties: {
         bookingId: { bsonType: 'int' },
         title: { bsonType: 'string' }
-
     },
     required: ['bookingId', 'title']
 };
 
-export default schema;
+export { transportBooking };

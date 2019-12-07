@@ -7,7 +7,7 @@ export interface IJsonSchema extends IJsonSchemaBase {
     required?: string[];
     properties: {
         [name: string]:
-        IJsonSchema |
+        |
         IJsonSchemaEnum |
         IJsonSchemaString |
         IJsonSchemaDouble |
