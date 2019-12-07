@@ -1,57 +1,36 @@
+import bodyParser from 'body-parser';
 import express from 'express';
-import apps from './apps';
+import { checkCollection, resolveApp, resolveFunction } from './middleware';
+import { MongoHelper } from './mongo.helper';
+
+const jsonParser = bodyParser.json();
 const srv = express();
-const port = 8080; // default port to listen
+const port = 4000; // default port to listen
 
-function resolveApp(req: express.Request, res: express.Response, next: () => void) {
-    const appName = req.params.appName;
-    if (!(apps as any)[appName]) {
-        res.send(`No app named ${appName} !!!`);
-        return;
-    }
-    req.params.app = (apps as any)[appName];
-    next();
+srv.use(jsonParser);
+srv.use('/:appName/*', resolveApp);
+srv.use('/:appName/functions/:functionName', [resolveFunction, handleFunction]);
+srv.use('/:appName/db/:collection/:id*?', [checkCollection, handleDb]);
+
+function handleFunction(req: express.Request, res: express.Response) {
+    res.locals.function(req, res);
 }
 
-function checkCollection(req: express.Request, res: express.Response, next: () => void) {
-    const collection = req.params.collection;
-    if (!req.params.app.collections.find((col: any) => col.name === collection)) {
-        res.send(`No col named ${collection} !!!`);
-        return;
-    }
-    next();
-}
-
-function resolveFunction(req: express.Request, res: express.Response, next: () => void) {
-    const app = req.params.app;
-    const functionName = req.params.functionName;
-    if (!app[functionName]) {
-        res.send(`No fun named ${functionName} !!!`);
-        return;
-    } else {
-        req.params.function = app[functionName];
-    }
-    next();
-}
-
-// define a route handler for the default home page
-srv.get('/', (req, res) => {
-    res.send({ hello: 'world' });
-});
-
-srv.get('/:appName/db/:collection', resolveApp, checkCollection, (req, res) => {
-    const appName = req.params.appName;
+function handleDb(req: express.Request, res: express.Response) {
+    const appName = res.locals.appName;
     const collection = req.params.collection;
     res.send(`reading from DB_${appName} / ${collection}`);
-
-});
-
-srv.get('/:appName/function/:functionName', resolveApp, resolveFunction, (req, res) => {
-    const response = req.params.function();
-    res.send(response);
-});
+}
 
 // start the express server
 srv.listen(port, () => {
     console.log(`server started at http://localhost:${port}`);
+});
+
+srv.on('listening', async () => {
+    try {
+        await MongoHelper.connect(`mongodb://mongo:27017/`);
+    } catch (err) {
+        console.error(`Unable to connect to Mongo!`, err);
+    }
 });
