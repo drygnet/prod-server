@@ -1,5 +1,6 @@
 const config = {
-    DB: 'mongodb://mongo:27017/'
+    TPNS: 'test1',
+    DBServer: 'mongodb://mongodev:27017/'
 };
 
 export default config;
