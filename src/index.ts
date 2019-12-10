@@ -9,14 +9,13 @@ import { MongoHelper } from './mongo.helper';
 
 let client: MongoClient;
 MongoHelper.connect(config.DBServer).then((res) => {
-    client = res;
+	client = res;
+	initDB(client);
 });
 
 const jsonParser = bodyParser.json();
 const srv = express();
 const port = 4000;
-
-initDB();
 
 srv.use(jsonParser);
 srv.use('/:appName/*', resolveApp);

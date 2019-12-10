@@ -1,6 +1,7 @@
+import { MongoClient } from 'mongodb';
 import apps from './apps';
 
-const initDB = () => {
+const initDB = (client: MongoClient) => {
     Object.entries(apps).forEach((item) => {
         const [name, app] = item;
         console.info(`INIT ${name}`);
