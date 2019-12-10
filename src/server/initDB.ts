@@ -1,12 +1,12 @@
 import { MongoClient } from 'mongodb';
-import apps from './apps';
+import apps from '../apps';
 
 const initDB = (client: MongoClient) => {
     Object.entries(apps).forEach((item) => {
         const [name, app] = item;
         console.info(`INIT APP ${name}`);
         const db = client.db(name);
-        app.collections.map((col) => {
+        app.collections.map((col: any) => {
             console.info(`Creating collection ${name}/${col.name}`);
             db.createCollection(col.name, {
                 autoIndexId: true,
@@ -29,6 +29,12 @@ const initDB = (client: MongoClient) => {
                         console.log('Schema added');
                     }
                 });
+            }
+            console.log(col);
+            if (col.index) {
+                console.log(`Creating index for ${col.name} -> ${col.index}`);
+                const collection = db.collection(col.name);
+                collection.createIndexes(col.index);
             }
         });
     });

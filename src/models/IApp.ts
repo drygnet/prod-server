@@ -1,3 +1,4 @@
+import { IndexSpecification } from 'mongodb';
 import { IJsonSchema } from './IJsonSchema';
 
 export interface IApp {
@@ -8,4 +9,5 @@ export interface IApp {
 interface ICollection {
     name: string;
     schema?: IJsonSchema;
+    index?: IndexSpecification[];
 }

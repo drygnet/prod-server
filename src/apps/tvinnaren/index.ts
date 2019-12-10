@@ -6,7 +6,7 @@ const tvinnaren: IApp = {
     collections: [
         {
             name: 'cases',
-            schema: tvinnarenCase
+            schema: tvinnarenCase,
         },
         {
             name: 'products',

@@ -2,10 +2,10 @@ import Ajv from 'ajv';
 import bodyParser from 'body-parser';
 import express from 'express';
 import { MongoClient } from 'mongodb';
-import config from './db';
-import { initDB } from './initDB';
-import { checkCollection, resolveApp, resolveFunction } from './middleware';
-import { MongoHelper } from './mongo.helper';
+import config from './server/db';
+import { initDB } from './server/initDB';
+import { checkCollection, resolveApp, resolveFunction } from './server/middleware';
+import { MongoHelper } from './server/mongo.helper';
 
 let client: MongoClient;
 MongoHelper.connect(config.DBServer).then((res) => {
@@ -46,7 +46,11 @@ async function validate(req: express.Request, res: express.Response, err: any) {
     const ajv = new Ajv();
     const valid = ajv.validate(schema.$jsonSchema, data);
     if (!valid) {
-        res.send({ error: err, validationError: ajv.errors });
+        let hint = 'Check your data, (or schema if this is early in development)';
+        if (ajv.errors[0].keyword === 'additionalProperties') {
+            hint = 'when additionalProperties = false, add "_id: { bsonType: \'objectId\' }" to the schema';
+        }
+        res.send({ error: err, validationError: ajv.errors, hint });
     } else {
         res.send({ error: err });
     }

@@ -1,5 +1,5 @@
 import express from 'express';
-import apps from './apps';
+import apps from '../apps';
 
 const resolveApp = (req: express.Request, res: express.Response, next: () => void) => {
     const appName = req.params.appName;

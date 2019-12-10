@@ -1,10 +1,12 @@
+import { IApp } from './../../models/IApp';
 import { transportBooking } from './schemas';
 
-const interntransport = {
+const interntransport: IApp = {
     collections: [
         {
             name: 'bookings',
-            schema: transportBooking
+            schema: transportBooking,
+            index: [{ key: { bookingId: 1 } }]
         }
     ]
 };

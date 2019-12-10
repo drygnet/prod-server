@@ -4,6 +4,7 @@ const transportBooking: IJsonSchema = {
     bsonType: 'object',
     additionalProperties: false,
     properties: {
+        _id: { bsonType: 'objectId' },
         bookingId: { bsonType: 'int' },
         title: { bsonType: 'string' }
     },
