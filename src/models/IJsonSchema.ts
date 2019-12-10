@@ -4,7 +4,7 @@ interface IJsonSchemaBase {
 
 export interface IJsonSchema extends IJsonSchemaBase {
     bsonType: 'object';
-    required?: string[];
+    required: string[];
     additionalProperties: false;
     properties: {
         [name: string]:
