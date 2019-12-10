@@ -6,7 +6,7 @@ const interntransport: IApp = {
         {
             name: 'bookings',
             schema: transportBooking,
-            index: [{ key: { bookingId: 1 } }]
+            index: [{ key: { bookingId: 1 }, background: true, unique: false }]
         }
     ]
 };

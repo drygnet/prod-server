@@ -9,7 +9,6 @@ const initDB = (client: MongoClient) => {
         app.collections.map((col: any) => {
             console.info(`Creating collection ${name}/${col.name}`);
             db.createCollection(col.name, {
-                autoIndexId: true,
                 strict: true
             }, (err, collection) => {
                 if (err) {
@@ -30,11 +29,24 @@ const initDB = (client: MongoClient) => {
                     }
                 });
             }
-            console.log(col);
             if (col.index) {
                 console.log(`Creating index for ${col.name} -> ${col.index}`);
                 const collection = db.collection(col.name);
-                collection.createIndexes(col.index);
+                collection.createIndexes(col.index, async (error, result) => {
+                    if (error) {
+                        console.log('Error creating index, attempting drop', JSON.stringify(error));
+                        await collection.dropIndexes();
+                        collection.createIndexes(col.index, (error2, result2) => {
+                            if (error2) {
+                                console.log('Error creating index (again)', JSON.stringify(error2));
+                            } else {
+                                console.log('Creating indexes', result2);
+                            }
+                        });
+                    } else {
+                        console.log('Creating indexes', result);
+                    }
+                });
             }
         });
     });

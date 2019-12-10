@@ -41,26 +41,21 @@ srv.post('/:appName/db/:collection', (req: express.Request, res: express.Respons
 
 async function validate(req: express.Request, res: express.Response, err: any) {
     res.status(400);
-    const schema = await getShema(req.params.appName, req.params.collection);
+    const db = client.db(req.params.appName);
+    const collinfo: any = await db.listCollections({ name: req.params.collection }).next();
+    const schema = collinfo.options.validator;
     const data = req.body;
     const ajv = new Ajv();
-    const valid = ajv.validate(schema.$jsonSchema, data);
+    const valid = schema ? ajv.validate(schema.$jsonSchema, data) : true;
     if (!valid) {
         let hint = 'Check your data, (or schema if this is early in development)';
         if (ajv.errors[0].keyword === 'additionalProperties') {
             hint = 'when additionalProperties = false, add "_id: { bsonType: \'objectId\' }" to the schema';
         }
-        res.send({ error: err, validationError: ajv.errors, hint });
+        res.send({ error: err, validationError: ajv.errors, schema, hint });
     } else {
         res.send({ error: err });
     }
-}
-
-async function getShema(dbname: string, collection: string) {
-    console.log('DBNAME', dbname);
-    const db = client.db(dbname);
-    const collinfo: any = await db.listCollections({ name: collection }).next();
-    return collinfo.options.validator;
 }
 
 // start the express server
