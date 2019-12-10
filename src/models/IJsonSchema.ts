@@ -5,15 +5,20 @@ interface IJsonSchemaBase {
 export interface IJsonSchema extends IJsonSchemaBase {
     bsonType: 'object';
     required?: string[];
+    additionalProperties: false;
     properties: {
         [name: string]:
-        |
+        | IJsonSchemaObjectId |
         IJsonSchemaEnum |
         IJsonSchemaString |
         IJsonSchemaDouble |
         IJsonSchemaInt |
         IJsonSchemaArray
     };
+}
+
+interface IJsonSchemaObjectId extends IJsonSchemaBase {
+    bsonType: 'objectId';
 }
 
 interface IJsonSchemaEnum extends IJsonSchemaBase {

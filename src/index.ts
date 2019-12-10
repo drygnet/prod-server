@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import bodyParser from 'body-parser';
 import express from 'express';
-import { MongoClient, Server } from 'mongodb';
+import { MongoClient } from 'mongodb';
 import config from './db';
 import { initDB } from './initDB';
 import { checkCollection, resolveApp, resolveFunction } from './middleware';
@@ -9,8 +9,8 @@ import { MongoHelper } from './mongo.helper';
 
 let client: MongoClient;
 MongoHelper.connect(config.DBServer).then((res) => {
-	client = res;
-	initDB(client);
+    client = res;
+    initDB(client);
 });
 
 const jsonParser = bodyParser.json();
@@ -41,7 +41,7 @@ srv.post('/:appName/db/:collection', (req: express.Request, res: express.Respons
 
 async function validate(req: express.Request, res: express.Response, err: any) {
     res.status(400);
-    const schema = await getShema(req.params.db, req.params.collection);
+    const schema = await getShema(req.params.appName, req.params.collection);
     const data = req.body;
     const ajv = new Ajv();
     const valid = ajv.validate(schema.$jsonSchema, data);
@@ -53,7 +53,8 @@ async function validate(req: express.Request, res: express.Response, err: any) {
 }
 
 async function getShema(dbname: string, collection: string) {
-    const db = MongoHelper.client.db(dbname);
+    console.log('DBNAME', dbname);
+    const db = client.db(dbname);
     const collinfo: any = await db.listCollections({ name: collection }).next();
     return collinfo.options.validator;
 }

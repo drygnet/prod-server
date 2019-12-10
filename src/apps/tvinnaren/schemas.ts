@@ -2,7 +2,9 @@ import { IJsonSchema } from '../../models/IJsonSchema';
 
 const tvinnarenCase: IJsonSchema = {
     bsonType: 'object',
+    additionalProperties: false,
     properties: {
+        _id: { bsonType: 'objectId' },
         caseId: { bsonType: 'int' },
         status: { enum: ['nytt', 'stängt'] },
         subcases: {
@@ -10,6 +12,7 @@ const tvinnarenCase: IJsonSchema = {
             items: [
                 {
                     bsonType: 'object',
+                    additionalProperties: false,
                     properties: {
                         status: { enum: ['nytt', 'arbetar'] }
                     }
