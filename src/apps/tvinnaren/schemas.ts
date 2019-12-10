@@ -9,16 +9,15 @@ const tvinnarenCase: IJsonSchema = {
         status: { enum: ['nytt', 'stängt'] },
         subcases: {
             bsonType: 'array',
-            items: [
-                {
-                    bsonType: 'object',
-                    additionalProperties: false,
-                    properties: {
-                        status: { enum: ['nytt', 'arbetar'] }
-                    }
+            items:
+            {
+                bsonType: 'object',
+                additionalProperties: false,
+                required: ['status'],
+                properties: {
+                    status: { enum: ['nytt', 'arbetar'] }
                 }
-            ]
-
+            }
         },
         title: { bsonType: 'string' }
 

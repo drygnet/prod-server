@@ -42,5 +42,5 @@ interface IJsonSchemaDouble extends IJsonSchemaBase {
 
 interface IJsonSchemaArray extends IJsonSchemaBase {
     bsonType: 'array';
-    items: IJsonSchema[];
+    items: IJsonSchema;
 }
