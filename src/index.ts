@@ -1,13 +1,17 @@
+import { jimpEvChange } from '@jimp/core';
 import Ajv from 'ajv';
 import bodyParser from 'body-parser';
 import express from 'express';
-import { MongoClient } from 'mongodb';
+import { Db, MongoClient } from 'mongodb';
+import multer from 'multer';
+import GridFsStorage from 'multer-gridfs-storage';
 import config from './server/db';
 import { initDB } from './server/initDB';
 import { checkCollection, resolveApp, resolveFunction } from './server/middleware';
 import { MongoHelper } from './server/mongo.helper';
 
 let client: MongoClient;
+
 MongoHelper.connect(config.DBServer).then((res) => {
     client = res;
     initDB(client);
@@ -25,6 +29,31 @@ srv.use('/:appName/db/:collection/:id*?', [checkCollection]);
 function handleFunction(req: express.Request, res: express.Response) {
     res.locals.function(req, res);
 }
+
+srv.post('/:appName/files', (req: express.Request, res: express.Response) => {
+    const storage = new GridFsStorage({
+        db: client.db(res.locals.appName),
+        file: (request, file) => {
+            return {
+                bucketName: 'storage',
+                filename: file.originalname,
+            };
+        }
+    });
+
+    storage.on('connection', (db) => {
+        const upload = multer({
+            storage
+        }).single('file');
+        upload(req, res, (err: any) => {
+            if (err) {
+                console.log(err);
+                return res.send({ title: 'Uploaded Error', message: 'File could not be uploaded', error: err });
+            }
+            res.send({ title: 'Uploaded', message: `File has been ${req.file.id} uploaded!` });
+        });
+    });
+});
 
 srv.post('/:appName/db/:collection', (req: express.Request, res: express.Response) => {
     const db = client.db(req.params.appName);
