@@ -2,19 +2,25 @@ import Ajv from 'ajv';
 import express from 'express';
 import { MongoClient } from 'mongodb';
 
-async function validate(client: MongoClient, req: express.Request, res: express.Response, err: any) {
-    const schema = await getShema(client, req.params.db, req.params.collection);
-    const ajv = new Ajv();
-    const valid = ajv.validate(schema.$jsonSchema, req.params.body);
-    if (!valid) {
-        return ({ error: err, validationError: ajv.errors });
-    } else {
-        return ({ error: err });
+const validateShema = async (client: MongoClient, req: express.Request, res: express.Response, err: any) => {
+  const db = client.db(req.params.appName);
+  const collinfo: any = await db.listCollections({ name: req.params.collection }).next();
+  const schema = collinfo.options.validator;
+  const ajv = new Ajv({ allErrors: true });
+  const valid = ajv.validate(schema.$jsonSchema, req.body);
+  if (!valid) {
+    let hint = 'Check your data, (or schema if this is early in development)';
+    if (ajv.errors[0].keyword === 'additionalProperties') {
+      hint = 'when additionalProperties = false, add "_id: { bsonType: \'objectId\' }" to the schema';
     }
-}
+    let validationErrors = ajv.errors;
+    if (req.method === 'PATCH') {
+      validationErrors = ajv.errors.filter((itm) => itm.keyword !== 'required');
+    }
+    res.send({ error: err, validationErrors, schema, hint });
+  } else {
+    res.send({ error: err, schema, body: req.params.body });
+  }
+};
 
-async function getShema(client: MongoClient, dbname: string, collection: string) {
-    const db = client.db(dbname);
-    const collinfo: any = await db.listCollections({ name: collection }).next();
-    return collinfo.options.validator;
-}
+export default validateShema;
