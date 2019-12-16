@@ -1,11 +1,13 @@
 import bodyParser from 'body-parser';
 import express from 'express';
-import { Collection, MongoClient, ObjectId } from 'mongodb';
+import jwt from 'express-jwt';
+import { Collection } from 'mongodb';
 import multer from 'multer';
 import GridFsStorage from 'multer-gridfs-storage';
 import config from './server/db';
 import { initDB } from './server/initDB';
 import {
+  addMetadata,
   errorHandler,
   handleFunction,
   resolveApp,
@@ -14,6 +16,7 @@ import {
   setClient
 } from './server/middleware';
 import { MongoHelper } from './server/mongo.helper';
+import { publicKey } from './server/public.key';
 import validateShema from './server/validate';
 
 MongoHelper.connect(config.DBServer).then((res) => {
@@ -27,8 +30,10 @@ const srv = express();
 const port = 4000;
 
 srv.use(jsonParser);
+srv.use(jwt({ secret: publicKey, resultProperty: 'locals.user' }));
+srv.use(addMetadata);
 srv.use('/:appName/*', resolveApp);
-srv.use(':appName/files', resolveDb);
+srv.use('/:appName/files', resolveDb);
 srv.use('/:appName/functions/:functionName', [handleFunction]);
 srv.use('/:appName/db/:collection/:id*?', [resolveDb, resolveCollection]);
 
@@ -114,6 +119,7 @@ srv.use('/:appName/db/:collection/:id?', async (req: express.Request, res: expre
       break;
     default:
       doc = await collection.findOne({ _id: id });
+      res.send(doc);
   }
 
 });

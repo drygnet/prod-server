@@ -8,6 +8,11 @@ const setClient = (cl: MongoClient) => {
   client = cl;
 };
 
+const addMetadata = (req: express.Request, res: express.Response, next: any) => {
+  console.log(res.locals.user);
+  next();
+};
+
 const asyncMiddleware = (fn: any) =>
   (err: any, req: express.Request, res: express.Response, next: any) => {
     Promise.resolve(fn(req, res, next))
@@ -15,14 +20,15 @@ const asyncMiddleware = (fn: any) =>
   };
 
 const errorHandler = (err: any, req: express.Request, res: express.Response, next: any) => {
-  console.log('I AM THE ERRORHANDLER !!!!');
   res.status(500);
+  if (err.name === 'UnauthorizedError') {
+    res.status(401);
+  }
   res.send({ error: err });
 };
 
 const resolveApp = (req: express.Request, res: express.Response, next: any) => {
   const appName = req.params.appName;
-  console.log('resolveApp', req.params);
   if (!apps[appName]) {
     next(`No app named ${appName} !!!`);
   }
@@ -68,4 +74,13 @@ const handleFunction = (req: express.Request, res: express.Response, next: any) 
   }
 };
 
-export { asyncMiddleware, resolveApp, handleFunction, errorHandler, resolveCollection, resolveDb, setClient };
+export {
+  addMetadata,
+  asyncMiddleware,
+  resolveApp,
+  handleFunction,
+  errorHandler,
+  resolveCollection,
+  resolveDb,
+  setClient
+};
