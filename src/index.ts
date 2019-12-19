@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser';
+import { Request, Response } from 'express';
 import express from 'express';
 import jwt from 'express-jwt';
 import { Collection } from 'mongodb';
@@ -37,7 +38,7 @@ srv.use('/:appName/files', resolveDb);
 srv.use('/:appName/functions/:functionName', [handleFunction]);
 srv.use('/:appName/db/:collection/:id*?', [resolveDb, resolveCollection]);
 
-srv.post('/:appName/files', (req: express.Request, res: express.Response) => {
+srv.post('/:appName/files', (req: Request, res: Response) => {
   const storage = new GridFsStorage({
     db: res.locals.db,
     file: (request, file) => {
@@ -61,7 +62,19 @@ srv.post('/:appName/files', (req: express.Request, res: express.Response) => {
   });
 });
 
-srv.use('/:appName/db/:collection/:id?', async (req: express.Request, res: express.Response) => {
+srv.post('/:appName/db/:collection/:id/:array', (req: Request, res: Response) => {
+  const { collection, client, id } = res.locals;
+  const arrayName = req.params.array;
+  collection.findOneAndUpdate({ _id: id }, { $push: { [arrayName]: req.body } }, { returnOriginal: false })
+    .then((document: any) => {
+      res.send(document.value);
+    })
+    .catch((error: any) => {
+      validateShema(client, req, res, error);
+    });
+});
+
+srv.use('/:appName/db/:collection/:id?', async (req: Request, res: Response) => {
   const collection: Collection = res.locals.collection;
   const id = res.locals.id;
   const client = res.locals.client;
@@ -78,12 +91,12 @@ srv.use('/:appName/db/:collection/:id?', async (req: express.Request, res: expre
         res.send({ error: 'do not POST to endpoint with /:id (POST creates a new document)' });
       } else {
         collection.insertOne(req.body)
-        .then((dbresp) => {
-          res.send(dbresp.ops[0]);
-        })
-        .catch((err) => {
-          validateShema(client, req, res, err);
-        });
+          .then((dbresp) => {
+            res.send(dbresp.ops[0]);
+          })
+          .catch((err) => {
+            validateShema(client, req, res, err);
+          });
       }
       break;
 
@@ -127,6 +140,18 @@ srv.use('/:appName/db/:collection/:id?', async (req: express.Request, res: expre
       res.send(doc);
   }
 
+});
+
+srv.post('/:appName/db/:collection/:id/:array', (req: Request, res: Response) => {
+  const { collection, client, id } = res.locals;
+  const arrayName = req.params.array;
+  collection.findOneAndUpdate({ _id: id }, { $push: { [arrayName]: req.body } }, { returnOriginal: false })
+    .then((document: any) => {
+      res.send(document.value);
+    })
+    .catch((error: any) => {
+      validateShema(client, req, res, error);
+    });
 });
 
 srv.use(errorHandler);
