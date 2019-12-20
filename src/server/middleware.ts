@@ -1,4 +1,4 @@
-import express from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { Db, MongoClient, ObjectId } from 'mongodb';
 import apps from '../apps';
 
@@ -8,18 +8,19 @@ const setClient = (cl: MongoClient) => {
   client = cl;
 };
 
-const addMetadata = (req: express.Request, res: express.Response, next: any) => {
-  console.log(res.locals.user);
+const addMetadata = (req: Request, res: Response, next: any) => {
+  res.locals.metadata = {
+    date: new Date().toJSON(),
+    user: {
+      userId: res.locals.user.sub,
+      name: res.locals.user.name
+    }
+  };
+
   next();
 };
 
-const asyncMiddleware = (fn: any) =>
-  (err: any, req: express.Request, res: express.Response, next: any) => {
-    Promise.resolve(fn(req, res, next))
-      .catch(next);
-  };
-
-const errorHandler = (err: any, req: express.Request, res: express.Response, next: any) => {
+const errorHandler = (err: any, req: Request, res: Response, next: any) => {
   res.status(500);
   if (err.name === 'UnauthorizedError') {
     res.status(401);
@@ -27,7 +28,7 @@ const errorHandler = (err: any, req: express.Request, res: express.Response, nex
   res.send({ error: err });
 };
 
-const resolveApp = (req: express.Request, res: express.Response, next: any) => {
+const resolveApp = (req: Request, res: Response, next: any) => {
   const appName = req.params.appName;
   if (!apps[appName]) {
     next(`No app named ${appName} !!!`);
@@ -37,13 +38,13 @@ const resolveApp = (req: express.Request, res: express.Response, next: any) => {
   next();
 };
 
-const resolveDb = (req: express.Request, res: express.Response, next: any) => {
+const resolveDb = (req: Request, res: Response, next: any) => {
   res.locals.db = client.db(req.params.appName);
   res.locals.client = client;
   next();
 };
 
-const resolveCollection = (req: express.Request, res: express.Response, next: any) => {
+const resolveCollection = (req: Request, res: Response, next: any) => {
   const collectionName = req.params.collection;
   if (!res.locals.app.collections.find((col: any) => col.name === collectionName)) {
     next(`No col named ${collectionName} !!!`);
@@ -64,7 +65,7 @@ const resolveCollection = (req: express.Request, res: express.Response, next: an
   next();
 };
 
-const handleFunction = (req: express.Request, res: express.Response, next: any) => {
+const handleFunction = (req: Request, res: Response, next: any) => {
   const app = res.locals.app;
   const functionName = req.params.functionName;
   if (!app[functionName]) {
@@ -76,7 +77,6 @@ const handleFunction = (req: express.Request, res: express.Response, next: any) 
 
 export {
   addMetadata,
-  asyncMiddleware,
   resolveApp,
   handleFunction,
   errorHandler,
