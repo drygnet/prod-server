@@ -2,7 +2,7 @@ import bodyParser from 'body-parser';
 import { Request, Response } from 'express';
 import express from 'express';
 import jwt from 'express-jwt';
-import { Collection } from 'mongodb';
+import { Collection, MongoClient } from 'mongodb';
 import multer from 'multer';
 import GridFsStorage from 'multer-gridfs-storage';
 import config from './server/db';
@@ -34,7 +34,7 @@ const port = 4000;
 srv.use(jsonParser);
 srv.use(jwt({ secret: publicKey, resultProperty: 'locals.user' }));
 srv.use(addMetadata);
-srv.use('/', appIndex);
+srv.use('/appIndex', appIndex);
 srv.use('/:appName/*', resolveApp);
 srv.use('/:appName/files', resolveDb);
 srv.use('/:appName/functions/:functionName', [handleFunction]);
@@ -93,7 +93,9 @@ srv.post('/:appName/db/:collection/:id/:array', (req: Request, res: Response) =>
 
 // CRUD functions, see switch-black
 srv.use('/:appName/db/:collection/:id?', async (req: Request, res: Response) => {
-  const { collection, id, client } = res.locals;
+  const id = res.locals.id; // do not take id from req.params
+  const client: MongoClient = res.locals.client;
+  const collection: Collection = res.locals.collection;
 
   let doc: any;
   if (req.body) {
@@ -104,7 +106,6 @@ srv.use('/:appName/db/:collection/:id?', async (req: Request, res: Response) => 
   }
   switch (req.method) {
     case 'POST':
-      console.log('NEW');
       if (req.params.id) {
         res.status(400);
         res.send({ error: 'do not POST to endpoint with /:id (POST creates a new document)' });
@@ -122,8 +123,14 @@ srv.use('/:appName/db/:collection/:id?', async (req: Request, res: Response) => 
       break;
 
     case 'GET':
-      doc = await collection.findOne({ _id: id });
-      res.send(doc);
+      if (req.params.id) {
+        doc = await collection.findOne({ _id: id });
+        res.send(doc);
+      } else {
+        doc = await collection.find({ limit: 1000 }).toArray();
+        res.send(doc);
+      }
+
       break;
 
     case 'PUT':

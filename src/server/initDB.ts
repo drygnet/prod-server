@@ -1,20 +1,23 @@
 import { MongoClient } from 'mongodb';
 import apps from '../apps';
 import metadataSchema from '../models/metadataShema';
+import appSettings from '../models/settingsSchema';
 
 const initDB = (client: MongoClient) => {
   Object.entries(apps).forEach((item) => {
     const [name, app] = item;
     console.info(`INIT APP ${name}`);
     const db = client.db(name);
+    app.collections.push({ name: 'settings', schema: appSettings, index: [] });
     app.collections.map((col: any) => {
       console.info(`Creating collection ${name}/${col.name}`);
       db.createCollection(col.name, {
         strict: true
       }, (err, result) => {
         if (err) {
-          console.log(`collection ${col.name} already exists`);
-          console.log(err);
+          if (!err.message.includes('already exists. Currently in strict mode')) {
+            console.log(err); // all real errors
+          }
         }
         // All the collection stuff in the callback YEY
         if (col.schema) {
@@ -27,15 +30,17 @@ const initDB = (client: MongoClient) => {
 
           col.index.push({ key: { '_created.user.id': 1 }, background: true, unique: false });
           col.index.push({ key: { '_modified.user.name': 1 }, background: true, unique: false });
-
+          console.log('------------------------PUSHING', name, col.name);
           col.schema.required.push('_created', '_modified');
+          // no duplicate values
+          col.schema.required = [...new Set(col.schema.required)];
           db.command({
             collMod: col.name,
             validator: { $jsonSchema: col.schema },
             validationLevel: 'strict'
           }, (schemaError, info) => {
-            if (err) {
-              console.log('ERROR adding schema', schemaError, info);
+            if (schemaError) {
+              console.log('ERROR adding schema', name, col.name, schemaError);
             }
           });
         }
