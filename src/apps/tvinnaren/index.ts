@@ -7,9 +7,11 @@ const tvinnaren: IApp = {
     {
       name: 'cases',
       schema: tvinnarenCase,
+      index: []
     },
     {
       name: 'products',
+      index: []
     }
   ],
   closeCases: (req: express.Request, res: express.Response) => {

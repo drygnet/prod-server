@@ -38,6 +38,14 @@ srv.use('/:appName/files', resolveDb);
 srv.use('/:appName/functions/:functionName', [handleFunction]);
 srv.use('/:appName/db/:collection/:id*?', [resolveDb, resolveCollection]);
 
+srv.get('/:appName/info/:collection', resolveDb, async (req, res) => {
+  const db = res.locals.db;
+  const collinfo: any = await db.listCollections({ name: req.params.collection }).next();
+  const info = collinfo.options;
+  res.send(info);
+
+});
+
 srv.post('/:appName/files', (req: Request, res: Response) => {
   const storage = new GridFsStorage({
     db: res.locals.db,

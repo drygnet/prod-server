@@ -1,12 +1,14 @@
+import { IApp } from './../../models/IApp';
 import { templateItem } from './schemas';
 
-const templateApp = {
-    collections: [
-        {
-            name: 'templateCollection',
-            schema: templateItem
-        }
-    ]
+const templateApp: IApp = {
+  collections: [
+    {
+      name: 'templateCollection',
+      schema: templateItem,
+      index: []
+    }
+  ]
 };
 
 export default templateApp;

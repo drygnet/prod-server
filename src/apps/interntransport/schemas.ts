@@ -1,14 +1,16 @@
 import { IJsonSchema } from '../../models/IJsonSchema';
 
 const transportBooking: IJsonSchema = {
-    bsonType: 'object',
-    additionalProperties: false,
-    properties: {
-        _id: { bsonType: 'objectId' },
-        bookingId: { bsonType: 'int' },
-        title: { bsonType: 'string' }
-    },
-    required: ['bookingId', 'title']
+  bsonType: 'object',
+  title: '',
+  description: '',
+  additionalProperties: false,
+  properties: {
+    _id: { bsonType: 'objectId', title: '', description: '' },
+    bookingId: { bsonType: 'int', title: '', description: '' },
+    title: { bsonType: 'string', title: '', description: '' }
+  },
+  required: ['bookingId', 'title']
 };
 
 export { transportBooking };

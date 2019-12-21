@@ -2,12 +2,12 @@ import { IndexSpecification } from 'mongodb';
 import { IJsonSchema } from './IJsonSchema';
 
 export interface IApp {
-    collections: ICollection[];
-    [x: string]: any;
+  collections: ICollection[];
+  [x: string]: any;
 }
 
 interface ICollection {
-    name: string;
-    schema?: IJsonSchema;
-    index?: IndexSpecification[];
+  name: string;
+  schema?: IJsonSchema;
+  index: IndexSpecification[];
 }

@@ -1,5 +1,12 @@
 interface IJsonSchemaBase {
-  description?: string;
+  /**
+   * Svensk beskrivning av fältet.
+   */
+  description: string;
+  /**
+   * Svensk titel på fältet (syns tex i listor).
+   */
+  title: string;
 }
 
 export interface IJsonSchema extends IJsonSchemaBase {

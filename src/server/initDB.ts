@@ -11,48 +11,50 @@ const initDB = (client: MongoClient) => {
       console.info(`Creating collection ${name}/${col.name}`);
       db.createCollection(col.name, {
         strict: true
-      }, (err, collection) => {
+      }, (err, result) => {
         if (err) {
           console.log(`collection ${col.name} already exists`);
+          console.log(err);
         }
-      });
-      if (col.schema) {
-        console.info(`Adding schema to collection ${name}/${col.name}`);
-        col.schema.properties._created = metadataSchema;
-        col.schema.properties._modified = metadataSchema;
+        // All the collection stuff in the callback YEY
+        if (col.schema) {
+          console.log(`Adding schema to collection ${name}/${col.name}`);
+          col.schema.properties._created = metadataSchema;
+          col.schema.properties._modified = metadataSchema;
 
-        col.schema.required.push('_created', '_modified');
-        db.command({
-          collMod: col.name,
-          validator: { $jsonSchema: col.schema },
-          validationLevel: 'strict'
-        }, (err, info) => {
-          if (err) {
-            console.log('ERROR adding schema', err, info);
-          } else {
-            console.log('Schema added');
-          }
-        });
-      }
-      if (col.index) {
-        console.log(`Creating index for ${col.name} -> ${col.index}`);
-        const collection = db.collection(col.name);
-        collection.createIndexes(col.index, async (error, result) => {
-          if (error) {
-            console.log('Error creating index, attempting drop', JSON.stringify(error));
-            await collection.dropIndexes();
-            collection.createIndexes(col.index, (error2, result2) => {
-              if (error2) {
-                console.log('Error creating index (again)', JSON.stringify(error2));
-              } else {
-                console.log('Creating indexes', result2);
-              }
-            });
-          } else {
-            console.log('Creating indexes', result);
-          }
-        });
-      }
+          col.index.push({ key: { '_created.date': 1 }, background: true, unique: false });
+          col.index.push({ key: { '_modified.date': 1 }, background: true, unique: false });
+
+          col.index.push({ key: { '_created.user.id': 1 }, background: true, unique: false });
+          col.index.push({ key: { '_modified.user.name': 1 }, background: true, unique: false });
+
+          col.schema.required.push('_created', '_modified');
+          db.command({
+            collMod: col.name,
+            validator: { $jsonSchema: col.schema },
+            validationLevel: 'strict'
+          }, (schemaError, info) => {
+            if (err) {
+              console.log('ERROR adding schema', schemaError, info);
+            }
+          });
+        }
+        if (col.index.length > 0) {
+          console.log(`Creating index for ${col.name} -> ${col.index}`);
+          const collection = db.collection(col.name);
+          collection.createIndexes(col.index, async (error, indexResult) => {
+            if (error) {
+              console.log('Error creating index, attempting drop', JSON.stringify(error));
+              await collection.dropIndexes();
+              collection.createIndexes(col.index, (error2, result2) => {
+                if (error2) {
+                  console.log('Error creating index (again)', JSON.stringify(error2));
+                }
+              });
+            }
+          });
+        }
+      });  // End of callback
     });
   });
 };
