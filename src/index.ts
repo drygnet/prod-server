@@ -9,6 +9,7 @@ import config from './server/db';
 import { initDB } from './server/initDB';
 import {
   addMetadata,
+  appIndex,
   errorHandler,
   handleFunction,
   resolveApp,
@@ -33,6 +34,7 @@ const port = 4000;
 srv.use(jsonParser);
 srv.use(jwt({ secret: publicKey, resultProperty: 'locals.user' }));
 srv.use(addMetadata);
+srv.use('/', appIndex);
 srv.use('/:appName/*', resolveApp);
 srv.use('/:appName/files', resolveDb);
 srv.use('/:appName/functions/:functionName', [handleFunction]);
@@ -70,6 +72,7 @@ srv.post('/:appName/files', (req: Request, res: Response) => {
   });
 });
 
+// Add item to array in document (:id)
 srv.post('/:appName/db/:collection/:id/:array', (req: Request, res: Response) => {
   const { collection, client, id, metadata } = res.locals;
   const arrayName = req.params.array;
@@ -88,6 +91,7 @@ srv.post('/:appName/db/:collection/:id/:array', (req: Request, res: Response) =>
     });
 });
 
+// CRUD functions, see switch-black
 srv.use('/:appName/db/:collection/:id?', async (req: Request, res: Response) => {
   const { collection, id, client } = res.locals;
 
@@ -121,14 +125,15 @@ srv.use('/:appName/db/:collection/:id?', async (req: Request, res: Response) => 
       doc = await collection.findOne({ _id: id });
       res.send(doc);
       break;
+
     case 'PUT':
       req.body._modified = res.locals.metadata;
       console.log('META', req.body);
       collection.findOneAndUpdate({ _id: id }, { $set: req.body }, { returnOriginal: false })
-        .then((document) => {
+        .then((document: any) => {
           res.send(document.value);
         })
-        .catch((error) => {
+        .catch((error: any) => {
           // not true, but skips one validation error
           req.body._created = res.locals.metadata;
           validateShema(client, req, res, error);
@@ -137,10 +142,10 @@ srv.use('/:appName/db/:collection/:id?', async (req: Request, res: Response) => 
 
     case 'DELETE':
       collection.deleteOne({ _id: id })
-        .then((result) => {
+        .then((result: any) => {
           res.send(result);
         })
-        .catch((error) => {
+        .catch((error: any) => {
           res.status(400);
           res.send(error);
         });

@@ -8,6 +8,10 @@ const setClient = (cl: MongoClient) => {
   client = cl;
 };
 
+const appIndex = (req: Request, res: Response) => {
+  res.send(apps);
+};
+
 const addMetadata = (req: Request, res: Response, next: any) => {
   res.locals.metadata = {
     date: new Date().toJSON(),
@@ -76,6 +80,7 @@ const handleFunction = (req: Request, res: Response, next: any) => {
 };
 
 export {
+  appIndex,
   addMetadata,
   resolveApp,
   handleFunction,
