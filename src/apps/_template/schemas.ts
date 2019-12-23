@@ -6,6 +6,7 @@ const templateItem: IJsonSchema = {
   title: 'svenskt ord för templateItem',
   description: 'en kollektion av templateItem',
   properties: {
+    _id: { bsonType: 'objectId', title: 'ID', description: 'MongoDB ID' },
     title: {
       bsonType: 'string',
       title: 'templateItem-Titel',
