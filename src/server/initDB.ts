@@ -8,7 +8,12 @@ const initDB = (client: MongoClient) => {
     const [name, app] = item;
     console.info(`INIT APP ${name}`);
     const db = client.db(name);
-    app.collections.push({ name: 'settings', schema: appSettings, index: [] });
+    app.collections.push(
+      {
+        name: 'settings',
+        schema: appSettings,
+        index: [{ key: { 'key': 1 }, background: false, unique: true }]
+      });
     app.collections.map((col: any) => {
       console.info(`Creating collection ${name}/${col.name}`);
       db.createCollection(col.name, {
@@ -21,7 +26,6 @@ const initDB = (client: MongoClient) => {
         }
         // All the collection stuff in the callback YEY
         if (col.schema) {
-          console.log(`Adding schema to collection ${name}/${col.name}`);
           col.schema.properties._created = metadataSchema;
           col.schema.properties._modified = metadataSchema;
 
@@ -30,7 +34,6 @@ const initDB = (client: MongoClient) => {
 
           col.index.push({ key: { '_created.user.id': 1 }, background: true, unique: false });
           col.index.push({ key: { '_modified.user.name': 1 }, background: true, unique: false });
-          console.log('------------------------PUSHING', name, col.name);
           col.schema.required.push('_created', '_modified');
           // no duplicate values
           col.schema.required = [...new Set(col.schema.required)];
@@ -45,8 +48,8 @@ const initDB = (client: MongoClient) => {
           });
         }
         if (col.index.length > 0) {
-          console.log(`Creating index for ${col.name} -> ${col.index}`);
           const collection = db.collection(col.name);
+          console.log('Creating indexes for ', name, col.name)
           collection.createIndexes(col.index, async (error, indexResult) => {
             if (error) {
               console.log('Error creating index, attempting drop', JSON.stringify(error));
