@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import express from 'express';
 import jwt from 'express-jwt';
-import multer from 'multer';
-import GridFsStorage from 'multer-gridfs-storage';
 import IAppLocals from './models/IAppLocals';
 import config from './server/db';
 import { initDB } from './server/initDB';
@@ -43,31 +41,6 @@ srv.get('/:appName/info/:collection', resolveDb, async (req, res) => {
   const collinfo: any = await db.listCollections({ name: req.params.collection }).next();
   const info = collinfo.options;
   res.send(info);
-
-});
-
-srv.post('/:appName/files', (req: Request, res: Response) => {
-  const storage = new GridFsStorage({
-    db: res.locals.db,
-    file: (request, file) => {
-      return {
-        bucketName: 'storage',
-        filename: file.originalname,
-      };
-    }
-  });
-
-  storage.on('connection', (db) => {
-    const upload = multer({
-      storage
-    }).single('file');
-    upload(req, res, (err: any) => {
-      if (err) {
-        return res.send({ title: 'Uploaded Error', message: 'File could not be uploaded', error: err });
-      }
-      res.send({ title: 'Uploaded', message: `File has been uploaded!`, id: req.file.id });
-    });
-  });
 });
 
 // Add item to array in document (:id)
@@ -89,6 +62,27 @@ srv.post('/:appName/db/:collection/:id/:array', (req: Request, res: Response) =>
     });
 });
 
+// delete item from array in document (:id) matching body (yes send a body with delete)
+srv.delete('/:appName/db/:collection/:id/:array', (req: Request, res: Response) => {
+  const { collection, client, id, metadata } = (res.locals as IAppLocals);
+  const arrayName = req.params.array;
+  collection.findOneAndUpdate(
+    { _id: id },
+    {
+      $pull: { [arrayName]: req.body },
+      $set: { _modified: metadata }
+    },
+    { returnOriginal: false })
+    .then((document: any) => {
+      res.send(document.value);
+    })
+    .catch((error: any) => {
+      res.status(400);
+      res.send(error);
+    });
+});
+
+// Actions with ID (GET (by ID), PUT and DELETE)
 srv.use('/:appName/db/:collection/:id', async (req: Request, res: Response) => {
   const { client, id, collection, metadata } = (res.locals as IAppLocals);
   let doc: any;
@@ -130,13 +124,14 @@ srv.use('/:appName/db/:collection/:id', async (req: Request, res: Response) => {
       break;
 
     default:
-      res.status(400)
-      res.send({ message: `${req.method} not available` });
+      res.status(400);
+      res.send({ message: `${req.method} not available (with ID in URL)` });
   }
 
 });
 
-srv.use('/:appName/db/:collection/', async (req: Request, res: Response) => {
+// Actions without ID (POST and GET)
+srv.use('/:appName/db/:collection', async (req: Request, res: Response) => {
   const { client, id, collection, metadata } = (res.locals as IAppLocals);
   let doc: any;
   if (req.body) {
@@ -160,19 +155,17 @@ srv.use('/:appName/db/:collection/', async (req: Request, res: Response) => {
 
     case 'GET':
       doc = await collection.find({}).limit(1000).toArray();
-      console.log(doc)
+      console.log(doc);
       res.send(doc);
       break;
 
     default:
-      res.status(400)
-      res.send({ message: `${req.method} not available` });
+      res.status(400);
+      res.send({ message: `${req.method} not available (Without ID in URL)` });
   }
 });
 
-
-
-
+// Handle errors
 srv.use(errorHandler);
 
 // start the express server

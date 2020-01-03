@@ -51,7 +51,7 @@ const resolveDb = (req: Request, res: Response, next: any) => {
 const resolveCollection = (req: Request, res: Response, next: any) => {
   const collectionName = req.params.collection;
   if (!res.locals.app.collections.find((col: any) => col.name === collectionName)) {
-    next(`No col named ${collectionName} !!!`);
+    next(`Collection ${collectionName} does not exist in ${res.locals.appName}`);
   } else {
     const db: Db = res.locals.db;
     db.collection(req.params.collection, (error: any, collection: any) => {
