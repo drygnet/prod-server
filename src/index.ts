@@ -1,5 +1,4 @@
-import { Request, Response } from 'express';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import jwt from 'express-jwt';
 import IAppLocals from './models/IAppLocals';
 import config from './server/db';
