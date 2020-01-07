@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction as Next, Request, Response } from 'express';
 import { Db, MongoClient, ObjectId } from 'mongodb';
 import apps from '../apps';
 
@@ -12,7 +12,7 @@ const appIndex = (req: Request, res: Response) => {
   res.send(apps);
 };
 
-const addMetadata = (req: Request, res: Response, next: any) => {
+const addMetadata = (req: Request, res: Response, next: Next) => {
   res.locals.metadata = {
     date: new Date().toJSON(),
     user: {
@@ -24,7 +24,7 @@ const addMetadata = (req: Request, res: Response, next: any) => {
   next();
 };
 
-const errorHandler = (err: any, req: Request, res: Response, next: any) => {
+const errorHandler = (err: any, req: Request, res: Response, next: Next) => {
   res.status(500);
   if (err.name === 'UnauthorizedError') {
     res.status(401);
@@ -32,7 +32,7 @@ const errorHandler = (err: any, req: Request, res: Response, next: any) => {
   res.send({ error: err });
 };
 
-const resolveApp = (req: Request, res: Response, next: any) => {
+const resolveApp = (req: Request, res: Response, next: Next) => {
   const appName = req.params.appName;
   if (!apps[appName]) {
     next(`No app named ${appName} !!!`);
@@ -42,13 +42,13 @@ const resolveApp = (req: Request, res: Response, next: any) => {
   next();
 };
 
-const resolveDb = (req: Request, res: Response, next: any) => {
+const resolveDb = (req: Request, res: Response, next: Next) => {
   res.locals.db = client.db(req.params.appName);
   res.locals.client = client;
   next();
 };
 
-const resolveCollection = (req: Request, res: Response, next: any) => {
+const resolveCollection = (req: Request, res: Response, next: Next) => {
   const collectionName = req.params.collection;
   if (!res.locals.app.collections.find((col: any) => col.name === collectionName)) {
     next(`Collection ${collectionName} does not exist in ${res.locals.appName}`);
@@ -69,11 +69,11 @@ const resolveCollection = (req: Request, res: Response, next: any) => {
   next();
 };
 
-const handleFunction = (req: Request, res: Response, next: any) => {
+const handleFunction = (req: Request, res: Response, next: Next) => {
   const app = res.locals.app;
   const functionName = req.params.functionName;
   if (!app[functionName]) {
-    next(`No function named ${functionName} !!!`);
+    next(`No function named ${functionName}`);
   } else {
     app[functionName](req, res);
   }
