@@ -27,7 +27,7 @@ const srv = express();
 const port = 4000;
 
 srv.use(express.json());
-srv.use(jwt({ secret: publicKey, resultProperty: 'locals.user' }));
+srv.use(jwt({ secret: publicKey, resultProperty: 'locals.user', algorithms: ['RS256'] }));
 srv.use(addMetadata);
 srv.use('/appIndex', appIndex);
 srv.use('/:appName/*', resolveApp);
@@ -154,7 +154,6 @@ srv.use('/:appName/db/:collection', async (req: Request, res: Response) => {
 
     case 'GET':
       doc = await collection.find({}).limit(1000).toArray();
-      console.log(doc);
       res.send(doc);
       break;
 

@@ -16,11 +16,10 @@ const addMetadata = (req: Request, res: Response, next: Next) => {
   res.locals.metadata = {
     date: new Date().toJSON(),
     user: {
-      id: res.locals.user.sub,
+      id: res.locals.user.preferred_username,
       name: res.locals.user.name
     }
   };
-
   next();
 };
 
