@@ -1,1 +1,11 @@
-export const publicKey = 'shhhhhhared-secret';
+export const publicKey =
+`-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvq/3TOSbrUzpGPHFEwjm
+eoE/Zu3+wU4vaeEvjQzUHXwIefy8bDuMav6OzUiEXhjLX5JRkGhds3lNGR3CSZga
+rtIKWv5Vrc7F2YcBcgzrpO06kVcewRMjdhrPYfUfO6QklAOSCcPq4RUhEvkGEwbA
+w3awclve1KuhpX6fOIInP8Gp8hrFDd/neBR3AY03JrZpezBdQoE24UHgAlHGb2UZ
+2KKjl3rLDMPh9HecjTiga3SbdcrhTAOYHYb4LwCSrThrHSyZFBxzTwQMS0NEyKV7
+/+ADrFunf9cuVcGpQZkvdwODl4tY+l2sd3WpoD/gMDpoFJVojjzF07ovrfntM4o8
+BwIDAQAB
+-----END PUBLIC KEY-----
+`;

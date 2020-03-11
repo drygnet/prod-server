@@ -1,5 +1,4 @@
-import { Request, Response } from 'express';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import jwt from 'express-jwt';
 import IAppLocals from './models/IAppLocals';
 import config from './server/db';
@@ -156,7 +155,6 @@ srv.use('/:appName/db/:collection', async (req: Request, res: Response) => {
 
     case 'GET':
       doc = await collection.find({}).limit(1000).toArray();
-      console.log(doc);
       res.send(doc);
       break;
 
