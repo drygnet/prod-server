@@ -25,11 +25,12 @@ MongoHelper.connect(config.DBServer).then((res) => {
 });
 
 const srv = express();
+console.log(srv.settings.env);
 const port = 4000;
 
 srv.use(express.json());
-srv.use(jwt({ secret: publicKey, resultProperty: 'locals.user' }));
-srv.use(addMetadata);
+// srv.use(jwt({ secret: publicKey, resultProperty: 'locals.user' }));
+// srv.use(addMetadata);
 srv.use('/appIndex', appIndex);
 srv.use('/:appName/*', resolveApp);
 srv.use('/:appName/files', resolveDb);

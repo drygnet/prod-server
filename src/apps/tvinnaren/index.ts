@@ -14,14 +14,14 @@ const tvinnaren: IApp = {
       index: []
     }
   ],
-  closeCases: (req: express.Request, res: express.Response) => {
+  closeCases(req: express.Request, res: express.Response) {
     if (req.body.cases) {
       res.send({ action: 'closing', cases: req.body.cases });
     } else {
       res.send({ response: 'hello' });
     }
   },
-  demoToken: (req: express.Request, res: express.Response) => {
+  demoToken(req: express.Request, res: express.Response) {
     res.send('token');
   }
 };

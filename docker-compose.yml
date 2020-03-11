@@ -1,16 +1,5 @@
 version: "2"
 services:
-  appdev:
-    container_name: appdev
-    image: node
-    volumes:
-      - .:/src
-    command: npm run dev
-    working_dir: /src
-    ports:
-      - "4000:4000"
-    links:
-      - mongodev
   mongodev:
     container_name: mongodev
     image: mongo

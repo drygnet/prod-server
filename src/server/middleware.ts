@@ -3,13 +3,15 @@ import { Db, MongoClient, ObjectId } from 'mongodb';
 import apps from '../apps';
 
 let client: MongoClient;
+let counter = 0;
 
 const setClient = (cl: MongoClient) => {
   client = cl;
 };
 
 const appIndex = (req: Request, res: Response) => {
-  res.send(apps);
+  counter++;
+  res.send({ apps, counter });
 };
 
 const addMetadata = (req: Request, res: Response, next: any) => {
@@ -39,6 +41,7 @@ const resolveApp = (req: Request, res: Response, next: any) => {
   }
   res.locals.appName = appName;
   res.locals.app = apps[appName];
+  res.locals.app.name = appName;
   next();
 };
 
@@ -51,7 +54,7 @@ const resolveDb = (req: Request, res: Response, next: any) => {
 const resolveCollection = (req: Request, res: Response, next: any) => {
   const collectionName = req.params.collection;
   if (!res.locals.app.collections.find((col: any) => col.name === collectionName)) {
-    next(`Collection ${collectionName} does not exist in ${res.locals.appName}`);
+    next(`Collection ${collectionName} does not exist in ${res.locals.app.name}`);
   } else {
     const db: Db = res.locals.db;
     db.collection(req.params.collection, (error: any, collection: any) => {
