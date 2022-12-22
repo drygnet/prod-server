@@ -27,7 +27,7 @@
   "dependencies": {
     "ajv": "^6.10.2",
     "express": "^4.16.4",
-    "express-jwt": "^6.0.0",
+    "express-jwt": "^8.2.0",
     "inquirer": "^7.0.0",
     "mongodb": "^3.3.5",
     "ncp": "^2.0.0",
